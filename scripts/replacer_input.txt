@@ -1,3 +1,23 @@
+=== PROCESSED: 2025-07-03 12:37:03 ===
+ERROR Block 1: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 2: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 3: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 4: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 5: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 6: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 7: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+===
+
+=== PROCESSED: 2025-07-03 12:35:37 ===
+ERROR Block 1: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 2: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 3: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 4: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 5: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 6: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+ERROR Block 7: File not found: /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
+===
+
 === PROCESSED: 2025-07-03 11:54:40 ===
 SUCCESS Block 1: Updated /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
 SUCCESS Block 2: Updated /Users/stuart/repos/cdd/cdd2/cdd_abridged_ref_card_for_llms.md
