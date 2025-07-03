@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This reference enables LLMs to generate correct CDD-structured code. CDD is a language-agnostic development paradigm that creates codebases LLMs can reliably understand and evolve autonomously.
+This reference enables LLMs to generate correct CDD-structured code. CDD creates codebases that LLMs can reliably understand and evolve autonomously.
 
 **Core insight**: Traditional codebases evolved through human refactoring are illegible to LLMs. CDD provides structure for deterministic, autonomous code generation.
 
@@ -14,6 +14,7 @@ This reference enables LLMs to generate correct CDD-structured code. CDD is a la
 4. **Regeneration over refactoring**: When covenants change, regenerate tests. When tests fail, fix implementation. This maintains the covenant → test → implementation chain of truth
 
 Each file is self-contained for LLM context windows, with no implicit cross-references.
+
 
 ## Core Tenets
 
@@ -35,23 +36,23 @@ Each file is self-contained for LLM context windows, with no implicit cross-refe
 ## Structure
 ```
 <repo>/
-├── [package manifest]    # package.json, requirements.txt, Cargo.toml, etc.
-└── proj/                 # Root component
+├── package.json         # External npm deps only
+└── proj/                # Root component
     ├── doc/
-    │   ├── API.md        # Exports & dependencies
-    │   ├── ABSTRACT.md   # 60-word purpose + 300-word overview
-    │   └── ARCH.md       # Tech decisions, constraints, patterns
-    ├── cov/              # Behavioral contracts
+    │   ├── API.md       # Exports & dependencies
+    │   ├── ABSTRACT.md  # 60-word purpose + 300-word overview
+    │   └── ARCH.md      # Tech decisions, constraints, patterns
+    ├── cov/             # Behavioral contracts
     │   └── {path}/
     │       └── {function}.cov.md
-    ├── test/             # Generated from covenants
+    ├── test/            # Generated from covenants
     │   └── {path}/
-    │       └── {function}.[test-ext]
-    ├── test-intn/        # Verify dependencies exist at runtime
-    │   └── {dep-path}/   # Full path, slashes → hyphens
+    │       └── {function}.test.ts
+    ├── test-intn/       # Verify dependencies exist at runtime
+    │   └── {dep-path}/  # Full path, slashes → hyphens
     ├── src/
-    │   └── {path}.[ext]
-    └── comp/             # Sub-components (same structure)
+    │   └── {path}.ts
+    └── comp/            # Sub-components (same structure)
 ```
 
 ## Path Rules
@@ -73,13 +74,13 @@ proj/comp/{types-component}: *  # Import all
 
 ## Exports
 ### {functionName}
-- **Signature**: `{functionName}(param: Type) -> ReturnType`
+- **Signature**: `(param: Type) => ReturnType`
 - **Purpose**: Single sentence.
 - **Throws**: `{ErrorType}` when {condition}
 - **Re-export from**: `proj/comp/{source}` (if re-exporting)
 
 ### {TypeName}
-- **Type**: `type {TypeName} = {definition}`
+- **Type**: `{typescript definition}`
 - **Purpose**: Single sentence.
 ```
 
@@ -87,7 +88,7 @@ proj/comp/{types-component}: *  # Import all
 **Purpose**: Hand-written behavioral contracts that generate tests
 ```markdown
 ## Signature
-`validateCard(card: string) -> ValidationResult`
+`validateCard(card: string): ValidationResult`
 
 ## Examples
 - `validateCard("4111111111111111")` → `{valid: true}`

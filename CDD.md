@@ -1,5 +1,7 @@
 # CDD: Covenant-Driven Development Specification
 
+TODO this needs to be edited to be made language-agnostic, like the CDD_ref.md is now
+
 ## Purpose
 
 CDD aims to enable LLMs to generate, maintain, and evolve entire codebases autonomously by:
