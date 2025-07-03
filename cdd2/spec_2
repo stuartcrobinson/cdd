@@ -87,9 +87,12 @@ payment/
     ├── stripe/
     │   ├── doc/API.md
     │   └── src/index.ts
+    │   ...
     └── square/
         ├── doc/API.md
         └── src/index.ts
+        ...
+...        
 ```
 
 Visibility:
