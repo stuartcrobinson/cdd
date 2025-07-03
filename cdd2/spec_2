@@ -26,29 +26,31 @@ The core insight: Traditional codebases evolved through human refactoring are il
 
 ## 1. Structure
 
-### 1.1 Component Anatomy
+### 1.1 Component Anatomy### 1.1 Component Anatomy
 
 ```
 {component}/
 ├── doc/
-│   ├── API.md          # Required. Public exports and component type.
-│   ├── ABSTRACT.md     # Required. Purpose (60 words) + overview (300 words).
-│   ├── ARCH.md         # Required. Architecture patterns and constraints.
-│   ├── STORY.md        # Optional. Usage examples.
-│   ├── concepts/       # Optional. Domain explanations.
-│   └── adr/            # Optional. Architecture decisions (human reference only).
-├── cov/                # Required for standard components
-│   └── {path}/         # Mirrors src/ structure
+│   ├── API.md               # Required. Public exports and component type.
+│   ├── ABSTRACT.md          # Required. Purpose (60 words) + overview (300 words).
+│   ├── ARCH.md              # Required. Architecture patterns and constraints.
+│   ├── STORY.md             # Optional. Usage examples.
+│   ├── concepts/            # Optional. Domain explanations.
+│   └── adr/                 # Optional. Architecture decisions (human reference only).
+├── cov/                     # Required for standard components
+│   └── {path}/              # Mirrors src/ structure
 │       └── {function}.cov.md
-├── test/               # Required for standard components
-│   ├── {path}/         # Mirrors src/ structure
+├── test/                    # Required for standard components
+│   ├── {path}/              # Mirrors src/ structure
 │   │   └── {function}.test.ts
-│   └── _helpers/       # Optional. Test utilities.
+│   └── _helpers/            # Optional. Test utilities.
 ├── test-intn/
 │   └── {dependency-path}/   # Full path with slashes → hyphens
 │       └── {scenario}.test.ts
+├── comp/              # Optional. Nested components
+│   └── {nested-component}/  # Same structure as parent component
 └── src/
-    └── {path}.ts       # Implementation files
+    └── {path}.ts            # Implementation files
 ```
 
 ### 1.2 Component Documentation Dependency Rules 
@@ -59,11 +61,12 @@ Dependencies declared in `API.md`:
 ## Dependencies
 payment-types: [PaymentResult, CardType]
 fraud: [checkRisk, RiskLevel]
-payment/components/stripe: [charge]
+payment/comp/stripe: [charge]
 auth-types: *  # Import all exports
 ```
 
 Rules:
+- All paths are relative to repository root (`<repo>/`)
 - Full path for nested components
 - Explicit imports only
 - Wildcard `*` imports all exports
@@ -80,7 +83,7 @@ Nested components are components within components:
 payment/
 ├── doc/API.md
 ├── src/index.ts
-└── components/
+└── comp/
     ├── stripe/
     │   ├── doc/API.md
     │   └── src/index.ts
@@ -92,23 +95,57 @@ payment/
 Visibility:
 - No automatic parent/sibling visibility
 - Dependencies must be explicit
-- External components import via full path: `payment/components/stripe`
+- External components import via full path: `payment/comp/stripe`
 - Parent may depend on child (composition pattern)
 
 ### 1.4 Entry Point
 
+The `proj/` directory is itself a component following the full component anatomy:
+
 ```
-project/
-├── index.ts            # Entry point - explicitly lists public exports
+<repo>/
 ├── package.json        # External npm dependencies only
-└── {components}/       # All components
+├── package-lock.json   # npm lock file
+├── node_modules/       # External dependencies
+└── proj/            # Root component
+    ├── doc/
+    │   ├── API.md      # System's public exports
+    │   ├── ABSTRACT.md # Project overview
+    │   └── ARCH.md     # System architecture
+    ├── cov/            # Covenants for any root-level logic
+    ├── test/           # Unit tests for root logic
+    ├── test-intn/      # Integration tests between components (E2E tests at root level)
+    ├── src/
+    │   └── index.ts    # Entry point - exports public API
+    └── comp/     # All sub-components
 ```
 
-`index.ts` example:
+`proj/src/index.ts` example:
 ```typescript
-export { validateCard } from './auth/src'
-export { charge } from './payment/src'
-export type { PaymentResult } from './payment-types/src'
+// Re-export public API
+export { validateCard } from './comp/auth/src'
+export { charge } from './comp/payment/src'
+export type { PaymentResult } from './comp/payment-types/src'
+```
+
+`proj/doc/API.md` example:
+```markdown
+# Component: proj
+
+## Component Type
+standard
+
+## Dependencies
+proj/comp/auth: [validateCard]
+proj/comp/payment: [charge]
+proj/comp/payment-types: [PaymentResult]
+
+## Exports
+
+### validateCard
+- **Re-export from**: comp/auth
+- **Signature**: `(card: string) => ValidationResult`
+- **Purpose**: Validates credit card number.
 ```
 
 ## 2. Formats
@@ -130,6 +167,7 @@ standard | types-only
 - **Signature**: `(param: Type) => ReturnType`
 - **Purpose**: Single sentence.
 - **Throws**: `ErrorType` when {condition}
+- **Re-export from**: `{component-path}` (if re-exporting from another component)
 
 ### TypeName  
 - **Type**: `{typescript type definition}`
@@ -221,13 +259,15 @@ test('validateCard("") → throws ValidationError', () => {
 
 ### 3.1 Context Loading
 
-When implementing `fraud/detector.ts`:
+When implementing `proj/comp/fraud/src/detector.ts`:
 
-1. Load `fraud/doc/*` (excluding `adr/`)
-2. For each dependency in `fraud/doc/API.md`:
-   - Load `{dependency}/doc/API.md`
+1. Load `proj/comp/fraud/doc/*` (excluding `adr/`)
+2. For each dependency in `proj/comp/fraud/doc/API.md`:
+   - Load `{dependency}/doc/API.md` (all paths relative to repository root)
    - Extract declared imports with types directly in signature
 3. Load concept files referenced via markdown links
+
+Note: All paths in dependencies and imports are relative to repository root (`<repo>/`).
 
 Example:
 ```
@@ -295,7 +335,7 @@ test('payment functions exist and are callable', () => {
 ### 4.1 Basic Component
 
 ```
-auth/
+proj/comp/auth/
 ├── doc/
 │   ├── API.md
 │   └── ABSTRACT.md
@@ -311,12 +351,12 @@ auth/
     └── index.ts
 ```
 
-`auth/doc/API.md`:
+`proj/comp/auth/doc/API.md`:
 ```markdown
 # Component: auth
 
 ## Dependencies
-auth-types: [Token, User]
+proj/comp/auth-types: [Token, User]
 
 ## Exports
 
@@ -329,7 +369,7 @@ auth-types: [Token, User]
 ### 4.2 Type Component
 
 ```
-payment-types/
+proj/comp/payment-types/
 ├── doc/
 │   ├── API.md          # Component Type: types-only
 │   └── ABSTRACT.md
@@ -337,7 +377,7 @@ payment-types/
     └── index.ts
 ```
 
-`payment-types/doc/API.md`:
+`proj/comp/payment-types/doc/API.md`:
 ```markdown
 # Component: payment-types
 
@@ -359,16 +399,16 @@ types-only
 
 ### 4.3 Nested Component
 
-`payment/components/stripe/doc/API.md`:
+`proj/comp/payment/comp/stripe/doc/API.md`:
 ```markdown
-# Component: payment/components/stripe
+# Component: payment/comp/stripe
 
 ## Component Type
 standard
 
 ## Dependencies
-payment-types: [PaymentResult, CardType]
-payment: [validateCard]
+proj/comp/payment-types: [PaymentResult, CardType]
+proj/comp/payment: [validateCard]
 
 ## Exports
 
@@ -378,18 +418,38 @@ payment: [validateCard]
 - **Throws**: `PaymentError` when charge fails
 ```
 
-### 4.4 Cross-Dependency Integration
+### 4.4 Root Component
+
+```
+proj/
+├── doc/
+│   ├── API.md          # System public API
+│   ├── ABSTRACT.md     # Project overview  
+│   └── ARCH.md         # System architecture
+├── test-intn/          # Integration tests (E2E tests for the system)
+│   ├── auth-payment/
+│   │   └── token-validation.test.ts
+│   ├── user-registration.test.ts
+│   └── payment-flow.test.ts
+├── src/
+│   └── index.ts        # Public exports
+└── comp/
+    ├── auth/
+    └── payment/
+```
+
+### 4.5 Cross-Dependency Integration
 
 Given:
-- `fraud` depends on `payment/components/stripe`
-- `fraud` depends on `risk-engine`
+- `proj/comp/fraud` depends on `proj/comp/payment/comp/stripe`
+- `proj/comp/fraud` depends on `proj/comp/risk-engine`
 
 Generated structure:
 ```
-fraud/
+proj/comp/fraud/
 └── test-intn/
-    ├── payment-components-stripe/
+    ├── proj-comp-payment-comp-stripe/
     │   └── risk-check.test.ts
-    └── risk-engine/
+    └── proj-comp-risk-engine/
         └── score-calculation.test.ts
 ```

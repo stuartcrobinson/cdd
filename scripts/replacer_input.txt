@@ -1,63 +1,353 @@
-=== PROCESSED: 2025-07-03 00:27:24 ===
-SUCCESS Block 1: Updated /Users/stuart/repos/cdd/project/context-bundler/doc/ARCH.md
-SUCCESS Block 2: Updated /Users/stuart/repos/cdd/project/context-bundler/cov/bundler/bundleContext.cov.md
+=== PROCESSED: 2025-07-03 11:21:43 ===
+SUCCESS Block 1: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 2: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 3: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 4: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 5: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 6: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 7: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 8: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 9: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 10: Updated /Users/stuart/repos/cdd/cdd2/spec_2
+SUCCESS Block 11: Updated /Users/stuart/repos/cdd/cdd2/spec_2
 ===
 
+Here are the edit instructions to update the spec:
+
 <<<EXPLANATION>>>
 
-Update ARCH.md error handling section with formal scenarios for fail/warn/continue behaviors to support incremental development
+Remove test-e2e from the component anatomy since it's redundant with test-intn at the root level
 
 <<<FILE>>>
 
-/Users/stuart/repos/cdd/project/context-bundler/doc/ARCH.md
+cdd2/spec_2
 
 <<<SEARCH>>>
-## Error Handling Strategy
-- Missing files: Report with component path, continue processing
-- Malformed API.md: Warn and skip dependency extraction
-- Circular imports: Load each component once, warn on cycles
-- Undefined imports: Include warning in output for LLM awareness
+├── test-intn/
+│   └── {dependency-path}/   # Full path with slashes → hyphens
+│       └── {scenario}.test.ts
+├── test-e2e/                # Root component only: end-to-end tests
+│   └── {scenario}.test.ts
 <<<REPLACE>>>
-## Error Handling Strategy
-
-### FAIL (throw Error)
-- Target file doesn't exist
-- Target file outside any component
-- Target component missing doc/API.md
-
-### WARN (include in output) 
-- Dependency component doesn't exist
-- Dependency API.md malformed/unparseable
-- Circular dependency detected (after first occurrence)
-- Import not found in dependency's exports
-- Target component missing required ARCH.md or ABSTRACT.md
-
-### CONTINUE (silent)
-- doc/adr/* files (human-only, skip)
-- Empty directories
-- Non-markdown files in doc/
-
-This approach supports incremental development where dependencies may not exist yet, while failing fast on critical issues that prevent any meaningful context generation.
+├── test-intn/
+│   └── {dependency-path}/   # Full path with slashes → hyphens
+│       └── {scenario}.test.ts
 <<<END>>>
 
-
 <<<EXPLANATION>>>
 
-Update covenant to reflect warning behavior for missing dependencies rather than throwing errors
+Update entry point section to remove test-e2e and clarify that all paths are relative to repository root
 
 <<<FILE>>>
 
-/Users/stuart/repos/cdd/project/context-bundler/cov/bundler/bundleContext.cov.md
+cdd2/spec_2
 
 <<<SEARCH>>>
-## Examples
-- `bundleContext("fraud/src/detector.ts")` → returns markdown containing fraud/doc/* + filtered dependency APIs
-- `bundleContext("nonexistent/file.ts")` → throws Error containing "not found"
-- `bundleContext("README.md")` → throws Error containing "outside component"
+└── project/            # Root component
+    ├── doc/
+    │   ├── API.md      # System's public exports
+    │   ├── ABSTRACT.md # Project overview
+    │   └── ARCH.md     # System architecture
+    ├── cov/            # Covenants for any root-level logic
+    ├── test/           # Unit tests for root logic
+    ├── test-intn/      # Integration tests between components
+    ├── test-e2e/       # End-to-end/UAT tests
+    ├── src/
+    │   └── index.ts    # Entry point - exports public API
+    └── components/     # All sub-components
 <<<REPLACE>>>
-## Examples
-- `bundleContext("fraud/src/detector.ts")` → returns markdown containing fraud/doc/* + filtered dependency APIs
-- `bundleContext("fraud/src/detector.ts")` with missing dependency → returns markdown with "WARNING: Component 'payment-types' not found" in output
-- `bundleContext("nonexistent/file.ts")` → throws Error containing "not found"
-- `bundleContext("README.md")` → throws Error containing "outside component"
+└── project/            # Root component
+    ├── doc/
+    │   ├── API.md      # System's public exports
+    │   ├── ABSTRACT.md # Project overview
+    │   └── ARCH.md     # System architecture
+    ├── cov/            # Covenants for any root-level logic
+    ├── test/           # Unit tests for root logic
+    ├── test-intn/      # Integration tests between components (E2E tests at root level)
+    ├── src/
+    │   └── index.ts    # Entry point - exports public API
+    └── components/     # All sub-components
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Update dependency paths in entry point example to be relative to repo root
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+## Dependencies
+components/auth: [validateCard]
+components/payment: [charge]
+components/payment-types: [PaymentResult]
+<<<REPLACE>>>
+## Dependencies
+project/components/auth: [validateCard]
+project/components/payment: [charge]
+project/components/payment-types: [PaymentResult]
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Add clarification about what re-export means in the API.md format section
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+### functionName
+- **Signature**: `(param: Type) => ReturnType`
+- **Purpose**: Single sentence.
+- **Throws**: `ErrorType` when {condition}
+<<<REPLACE>>>
+### functionName
+- **Signature**: `(param: Type) => ReturnType`
+- **Purpose**: Single sentence.
+- **Throws**: `ErrorType` when {condition}
+- **Re-export from**: `{component-path}` (if re-exporting from another component)
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Add path resolution rules to clarify all paths are relative to repository root
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+Rules:
+- Full path for nested components
+- Explicit imports only
+- Wildcard `*` imports all exports
+- No implicit transitive dependencies - You must explicitly declare every import you use, even if another dependency also imports it. This makes context loading deterministic.
+- No circular runtime dependencies. Documentation circular dependencies are allowed.
+- Exported types must include all referenced types
+<<<REPLACE>>>
+Rules:
+- All paths are relative to repository root (`<repo>/`)
+- Full path for nested components
+- Explicit imports only
+- Wildcard `*` imports all exports
+- No implicit transitive dependencies - You must explicitly declare every import you use, even if another dependency also imports it. This makes context loading deterministic.
+- No circular runtime dependencies. Documentation circular dependencies are allowed.
+- Exported types must include all referenced types
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Update context loading algorithm to clarify repository root paths
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+When implementing `components/fraud/src/detector.ts`:
+
+1. Load `components/fraud/doc/*` (excluding `adr/`)
+2. For each dependency in `components/fraud/doc/API.md`:
+   - Load `{dependency}/doc/API.md` (relative to project root)
+   - Extract declared imports with types directly in signature
+3. Load concept files referenced via markdown links
+
+Note: All paths are relative to the `project/` directory as the root component.
+<<<REPLACE>>>
+When implementing `project/components/fraud/src/detector.ts`:
+
+1. Load `project/components/fraud/doc/*` (excluding `adr/`)
+2. For each dependency in `project/components/fraud/doc/API.md`:
+   - Load `{dependency}/doc/API.md` (all paths relative to repository root)
+   - Extract declared imports with types directly in signature
+3. Load concept files referenced via markdown links
+
+Note: All paths in dependencies and imports are relative to repository root (`<repo>/`).
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Update basic component example to show repository-root relative paths
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+`project/components/auth/doc/API.md`:
+```markdown
+# Component: auth
+
+## Dependencies
+auth-types: [Token, User]
+<<<REPLACE>>>
+`project/components/auth/doc/API.md`:
+```markdown
+# Component: auth
+
+## Dependencies
+project/components/auth-types: [Token, User]
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Fix nested component example to use repository-root relative paths
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+`payment/components/stripe/doc/API.md`:
+```markdown
+# Component: payment/components/stripe
+
+## Component Type
+standard
+
+## Dependencies
+payment-types: [PaymentResult, CardType]
+payment: [validateCard]
+<<<REPLACE>>>
+`project/components/payment/components/stripe/doc/API.md`:
+```markdown
+# Component: payment/components/stripe
+
+## Component Type
+standard
+
+## Dependencies
+project/components/payment-types: [PaymentResult, CardType]
+project/components/payment: [validateCard]
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Remove test-e2e from root component pattern example
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+### 4.4 Root Component
+
+```
+project/
+├── doc/
+│   ├── API.md          # System public API
+│   ├── ABSTRACT.md     # Project overview  
+│   └── ARCH.md         # System architecture
+├── test-e2e/           # End-to-end tests
+│   ├── user-registration.test.ts
+│   └── payment-flow.test.ts
+├── test-intn/          # Component integration tests
+│   └── auth-payment/
+│       └── token-validation.test.ts
+├── src/
+│   └── index.ts        # Public exports
+└── components/
+    ├── auth/
+    └── payment/
+```
+<<<REPLACE>>>
+### 4.4 Root Component
+
+```
+project/
+├── doc/
+│   ├── API.md          # System public API
+│   ├── ABSTRACT.md     # Project overview  
+│   └── ARCH.md         # System architecture
+├── test-intn/          # Integration tests (E2E tests for the system)
+│   ├── auth-payment/
+│   │   └── token-validation.test.ts
+│   ├── user-registration.test.ts
+│   └── payment-flow.test.ts
+├── src/
+│   └── index.ts        # Public exports
+└── components/
+    ├── auth/
+    └── payment/
+```
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Update the type component example path to be consistent
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+### 4.2 Type Component
+
+```
+payment-types/
+├── doc/
+│   ├── API.md          # Component Type: types-only
+│   └── ABSTRACT.md
+└── src/
+    └── index.ts
+```
+
+`payment-types/doc/API.md`:
+<<<REPLACE>>>
+### 4.2 Type Component
+
+```
+project/components/payment-types/
+├── doc/
+│   ├── API.md          # Component Type: types-only
+│   └── ABSTRACT.md
+└── src/
+    └── index.ts
+```
+
+`project/components/payment-types/doc/API.md`:
+<<<END>>>
+
+<<<EXPLANATION>>>
+
+Update cross-dependency integration example to show full paths
+
+<<<FILE>>>
+
+cdd2/spec_2
+
+<<<SEARCH>>>
+### 4.5 Cross-Dependency Integration
+
+Given:
+- `fraud` depends on `payment/components/stripe`
+- `fraud` depends on `risk-engine`
+
+Generated structure:
+```
+fraud/
+└── test-intn/
+    ├── payment-components-stripe/
+    │   └── risk-check.test.ts
+    └── risk-engine/
+        └── score-calculation.test.ts
+```
+<<<REPLACE>>>
+### 4.5 Cross-Dependency Integration
+
+Given:
+- `project/components/fraud` depends on `project/components/payment/components/stripe`
+- `project/components/fraud` depends on `project/components/risk-engine`
+
+Generated structure:
+```
+project/components/fraud/
+└── test-intn/
+    ├── project-components-payment-components-stripe/
+    │   └── risk-check.test.ts
+    └── project-components-risk-engine/
+        └── score-calculation.test.ts
+```
 <<<END>>>
