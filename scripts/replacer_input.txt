@@ -1,0 +1,63 @@
+=== PROCESSED: 2025-07-03 00:27:24 ===
+SUCCESS Block 1: Updated /Users/stuart/repos/cdd/project/context-bundler/doc/ARCH.md
+SUCCESS Block 2: Updated /Users/stuart/repos/cdd/project/context-bundler/cov/bundler/bundleContext.cov.md
+===
+
+<<<EXPLANATION>>>
+
+Update ARCH.md error handling section with formal scenarios for fail/warn/continue behaviors to support incremental development
+
+<<<FILE>>>
+
+/Users/stuart/repos/cdd/project/context-bundler/doc/ARCH.md
+
+<<<SEARCH>>>
+## Error Handling Strategy
+- Missing files: Report with component path, continue processing
+- Malformed API.md: Warn and skip dependency extraction
+- Circular imports: Load each component once, warn on cycles
+- Undefined imports: Include warning in output for LLM awareness
+<<<REPLACE>>>
+## Error Handling Strategy
+
+### FAIL (throw Error)
+- Target file doesn't exist
+- Target file outside any component
+- Target component missing doc/API.md
+
+### WARN (include in output) 
+- Dependency component doesn't exist
+- Dependency API.md malformed/unparseable
+- Circular dependency detected (after first occurrence)
+- Import not found in dependency's exports
+- Target component missing required ARCH.md or ABSTRACT.md
+
+### CONTINUE (silent)
+- doc/adr/* files (human-only, skip)
+- Empty directories
+- Non-markdown files in doc/
+
+This approach supports incremental development where dependencies may not exist yet, while failing fast on critical issues that prevent any meaningful context generation.
+<<<END>>>
+
+
+<<<EXPLANATION>>>
+
+Update covenant to reflect warning behavior for missing dependencies rather than throwing errors
+
+<<<FILE>>>
+
+/Users/stuart/repos/cdd/project/context-bundler/cov/bundler/bundleContext.cov.md
+
+<<<SEARCH>>>
+## Examples
+- `bundleContext("fraud/src/detector.ts")` → returns markdown containing fraud/doc/* + filtered dependency APIs
+- `bundleContext("nonexistent/file.ts")` → throws Error containing "not found"
+- `bundleContext("README.md")` → throws Error containing "outside component"
+<<<REPLACE>>>
+## Examples
+- `bundleContext("fraud/src/detector.ts")` → returns markdown containing fraud/doc/* + filtered dependency APIs
+- `bundleContext("fraud/src/detector.ts")` with missing dependency → returns markdown with "WARNING: Component 'payment-types' not found" in output
+- `bundleContext("nonexistent/file.ts")` → throws Error containing "not found"
+- `bundleContext("README.md")` → throws Error containing "outside component"
+<<<END>>>
