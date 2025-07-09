@@ -97,6 +97,13 @@ payment/
 ...        
 ```
 
+```json
+asdf
+asdfasdf
+"asdf" = 1;
+
+```
+
 Visibility:
 - No automatic parent/sibling visibility
 - Dependencies must be explicit
