@@ -4,7 +4,7 @@ Context Bundler assembles documentation required for LLM code generation in CDD 
 **Overview (300 words):**
 Context Bundler operationalizes CDD's context loading algorithm to solve a specific problem: LLMs need complete, bounded documentation to generate correct code, but determining what documentation to include requires understanding implicit relationships across components. The bundler makes these decisions deterministic through explicit rules based on target file type.
 
-The tool recognizes three context needs. Minimal loading for API design tasks loads only API.md, ABSTRACT.md, and specific covenant files. Standard loading for implementation adds ARCH.md and all covenants. Deep loading for architectural work includes integration tests and concept files. These strategies map to CDD workflows: design contract first (minimal), implement behavior (standard), refactor architecture (deep).
+The tool recognizes three context needs. Minimal loading for API design tasks loads only API.md, ABSTRACT.md, and specific covenant files. Standard loading for implementation adds ARCH.md and *all covenants. Deep loading for architectural work includes integration tests and concept files. These strategies map to CDD workflows: design contract first (minimal), implement behavior (standard), refactor architecture (deep).
 
 Implementation centers on dependency filtering. When component A declares `payment-types: [PaymentResult]`, the bundler extracts only PaymentResult's definition from payment-types/doc/API.md, ignoring unexported types. This maintains component boundaries while providing complete type information.
 
@@ -15,3 +15,13 @@ Critical design decision: no reverse dependency tracking. When working on paymen
 Output structure prioritizes comprehension: component documentation first, then dependencies in declaration order, with clear section boundaries. The bundler includes file-path comments indicating the source of each section, enabling LLMs to understand documentation hierarchy.
 
 The tool assumes filesystem access to the complete project and operates statelessly - each invocation independently resolves all dependencies. This trades performance for simplicity and deterministic behavior.
+
+---
+
+# follow up
+
+* Standard loading for implementation adds ARCH.md and *all covenants...
+
+i dont think it should be all covenants... .hopefully it means all relevant covenants?  or is that just for a specific component?  
+
+this is all several weeks old.
