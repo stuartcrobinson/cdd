@@ -27,8 +27,30 @@ standard | types-only
 
 ## Dependencies
 [Update as implementation reveals needs]
-proj/comp/{component}: [{Import1}, {Import2}]
-external/{package}: [{Import1}]
+
+```yaml
+dependencies:
+  proj/comp/payment:
+    functions: [validateCard, processRefund]
+    types: [PaymentResult, CardType]
+    errors: [PaymentError]
+  
+  proj/comp/auth:
+    functions: [checkPermission, validateToken]
+    types: [User, TokenPayload]
+  
+  proj/comp/logger:
+    functions: [logTransaction]  # Audit requirement
+  
+  proj/comp/payment-types: "*"  # Wildcard for types-only
+  
+  external/lodash:
+    functions: [groupBy, mapValues]
+  
+  external/@stripe/stripe-js:
+    types: [Stripe, PaymentIntent]
+    functions: [loadStripe]
+```
 
 ## Exports
 ### {functionName}
@@ -36,15 +58,42 @@ external/{package}: [{Import1}]
 - **Purpose**: Single sentence.
 - **Throws**: `{ErrorType}` when {condition}
 - **Test-data**: `test-data/{path}/{functionName}.json`
-```
+
+
 
 ## Workflow
 
-### 1. Design → 2. Test → 3. Implement
+### Core Flow: Design → Test → Implement
 
 1. **Write docs**: ABSTRACT.md → ARCH.md → API.md
-2. **Design tests**: Component E2E → Extract functions → Unit tests
-3. **Implement**: Functions (red/green) → Update E2E → Wire component
+2. **Design tests**: E2E hypothesis → Decompose → Unit tests  
+3. **Implement**: Functions (red/green) → Revise E2E → Wire component
+
+### Test Authority & Evolution
+
+**Tests Are Source of Truth (But Not Infallible)**
+- Tests define what code SHOULD do
+- During debug: ALWAYS fix code to match tests first
+- Test errors discovered? Ask human: "I believe test X is incorrect because Y. Should I update it?"
+- NEVER auto-modify tests while debugging
+- Each test change needs explicit approval
+
+### Detailed Flow
+
+1. **E2E Test Hypothesis** - Write component test-data (expect evolution)
+2. **Pseudocode** - Rough implementation to discover structure
+3. **Extract Functions** - Identify & extract all pure functions
+4. **Unit Tests** - Write test-data for each function
+5. **Implement Functions** - Red/green/debug (fix code, not tests)
+6. **Revise E2E Tests** - Align with discovered behavior (ask human)
+7. **Wire Component** - Connect tested functions
+8. **Debug E2E** - Fix code until green
+
+**Debug Protocol**: Test fails? → Try fixing code → Still failing? → Consider test error → Request human approval for any test change
+
+**If docs are wrong**: STOP → Update docs → Update tests → Continue
+
+
 
 ### Critical Implementation Rules
 
