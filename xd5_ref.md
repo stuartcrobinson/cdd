@@ -1,7 +1,7 @@
 # XD5 LLM Quick Reference
 
 ## Core Principle
-Documentation maintains dependency graphs for deterministic context assembly. Track dependencies as discovered during implementation.
+Documentation maintains dependency graphs for deterministic context assembly. Initial dependencies are hypotheses - implementation discovers reality. The STOP protocol ensures documentation evolves to match actual dependencies.
 
 ## File Structure
 ```
@@ -26,12 +26,13 @@ Documentation maintains dependency graphs for deterministic context assembly. Tr
 standard | types-only
 
 ## Dependencies
-[Update as implementation reveals needs]
+[Provisional - updated via STOP protocol when implementation reveals actual needs]
 
 ```yaml
 dependencies:
+  # Initial hypothesis based on design
   proj/comp/payment:
-    functions: [validateCard, processRefund]
+    functions: [validateCard, processRefund]  # May change
     types: [PaymentResult, CardType]
     errors: [PaymentError]
   
@@ -53,6 +54,18 @@ dependencies:
 ```
 
 ## Exports
+[Structured YAML for dependency graph tooling, then prose descriptions]
+
+```yaml
+exports:
+  functions: [functionName1, functionName2]
+  types: [Type1, Type2, Type3]
+  classes:
+    ClassName:
+      methods: [method1, method2]
+  errors: [CustomError1, CustomError2]
+```
+
 ### {functionName}
 - **Signature**: `{functionName}(param: Type) -> ReturnType`
 - **Purpose**: Single sentence.
@@ -65,9 +78,9 @@ dependencies:
 
 ### Core Flow: Design → Test → Implement
 
-1. **Write docs**: ABSTRACT.md → ARCH.md → API.md
+1. **Write docs**: ABSTRACT.md → ARCH.md → API.md (provisional)
 2. **Design tests**: E2E hypothesis → Decompose → Unit tests  
-3. **Implement**: Functions (red/green) → Revise E2E → Wire component
+3. **Implement**: Discover real dependencies → Update docs → Complete code
 
 ### Test Authority & Evolution
 
@@ -97,7 +110,13 @@ dependencies:
 
 ### Critical Implementation Rules
 
-**🛑 STOP Protocol**: If implementation reveals doc errors:
+**Initial Docs Are Hypotheses**: 
+- First API.md contains best guesses
+- Dependencies WILL be wrong
+- This is expected and healthy
+- Discovery through implementation is the goal
+
+**🛑 STOP Protocol**: When implementation reveals doc errors:
 1. STOP immediately
 2. Update API.md/ARCH.md
 3. Continue with correct docs
