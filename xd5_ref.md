@@ -12,10 +12,14 @@ Documentation maintains dependency graphs for deterministic context assembly. In
     │   ├── ABSTRACT.md   # 60-word purpose + 300-word overview
     │   └── ARCH.md       # Technical decisions, constraints
     ├── test-data/        # Test cases as JSON/MD files
+    │   ├── unit/         # Unit test data
+    │   └── integration/  # Integration test data
     ├── test/             # Minimal harnesses loading test-data
+    │   ├── unit/         # Unit test harnesses
+    │   └── integration/  # Integration test harnesses
     ├── test-intn/        # Integration tests for dependencies
     ├── src/              # Implementation
-    └── comp/             # Sub-components (recursive)
+    └── comp/             # Sub-components (recursive) - do not need 'proj' dirs
 ```
 
 ## API.md Template
@@ -28,22 +32,25 @@ standard | types-only
 ## Dependencies
 [Provisional - updated via STOP protocol when implementation reveals actual needs]
 
+Mark internal component status: [PLANNED], [IN-PROGRESS], or [IMPLEMENTED]
+External dependencies do not need status markers.
+
 ```yaml
 dependencies:
   # Initial hypothesis based on design
-  proj/comp/payment:
-    functions: [validateCard, processRefund]  # May change
+  proj/comp/payment:                                       # [PLANNED]
+    functions: [validateCard, processRefund] # may change 
     types: [PaymentResult, CardType]
     errors: [PaymentError]
   
-  proj/comp/auth:
+  proj/comp/auth:                                          # [IMPLEMENTED]
     functions: [checkPermission, validateToken]
     types: [User, TokenPayload]
   
-  proj/comp/logger:
+  proj/comp/logger:                                        # [IN-PROGRESS]
     functions: [logTransaction]  # Audit requirement
   
-  proj/comp/payment-types: "*"  # Wildcard for types-only
+  proj/comp/payment-types: "*"  # Wildcard for types-only  # [IMPLEMENTED] 
   
   external/lodash:
     functions: [groupBy, mapValues]
@@ -70,7 +77,7 @@ exports:
 - **Signature**: `{functionName}(param: Type) -> ReturnType`
 - **Purpose**: Single sentence.
 - **Throws**: `{ErrorType}` when {condition}
-- **Test-data**: `test-data/{path}/{functionName}.json`
+- **Test-data**: `test-data/{path}/{functionName}.json` [PLANNED|IMPLEMENTED]
 
 
 
@@ -171,3 +178,36 @@ During implementation:
 **Path conventions**: All relative to `<repo>/`
 - Component: `proj/comp/{name}`
 - Nested: `proj/comp/{parent}/comp/{child}`
+
+
+# update 
+
+- need to update this so that we save our pseudocde in some sort of documetnation, maybe temp documentation.  so if we implement the fucntiosn to unit test, we dont get confused later about how theyre supposed to be used.
+
+- ideally, each extracted function unit-testable function would be in its own file.  for parallelism with the unit test files
+
+- TESTING PATHS
+
+dont save files directly to `/tmp/`.  save them to a dir in the tmp dir taht is named with the name of the test preceedd by 't_', eg `/tmp/t_move-nonexistent-file`
+
+like: 
+
+
+### 003-move-nonexistent-file
+
+```sh sham
+#!SHAM [@three-char-SHA-256: mnf]
+action = "file_move"
+old_path = "/tmp/t_move-nonexistent-file/ghost.txt"
+new_path = "/tmp/t_move-nonexistent-file/nowhere.txt"
+#!END_SHAM_mnf
+```
+
+```json
+{
+  "success": false,
+  "error": "file_move: Source file not found '/tmp/t_move-nonexistent-file/ghost.txt' (ENOENT)"
+}
+```
+
+consider using EARS somehow for specs/reqs: EARS: The Easy Approach to Requirements Syntax
