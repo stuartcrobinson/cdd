@@ -9,7 +9,7 @@ Documentation maintains dependency graphs for deterministic context assembly. In
 └── proj/
     ├── doc/
     │   ├── API.md        # ⚠️ CRITICAL: All dependencies + exports
-    │   ├── ABSTRACT.md   # 60-word purpose + 300-word overview
+    │   ├── ABSTRACT.md   # 60-word purpose + 300-word overview + brief spec in EARS format (The Easy Approach to Requirements Syntax)
     │   └── ARCH.md       # Technical decisions, constraints
     ├── test-data/        # Test cases as JSON/MD files
     │   ├── unit/         # Unit test data
@@ -211,3 +211,5 @@ new_path = "/tmp/t_move-nonexistent-file/nowhere.txt"
 ```
 
 consider using EARS somehow for specs/reqs: EARS: The Easy Approach to Requirements Syntax
+
+for dependency blocks in docs api, do not include external dependencies!!
