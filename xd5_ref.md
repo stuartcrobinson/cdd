@@ -1,5 +1,13 @@
 # XD5 LLM Quick Reference
 
+TODO update!!
+
+think about these from the very start:
+
+- error handling 
+- error messaging
+- logging/debugging output system!
+
 ## Core Principle
 Documentation maintains dependency graphs for deterministic context assembly. Initial dependencies are hypotheses - implementation discovers reality. The STOP protocol ensures documentation evolves to match actual dependencies.
 
